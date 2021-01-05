@@ -1,21 +1,46 @@
 <!DOCTYPE html>
 <html>
 <style>
-@import url('http://fonts.googleapis.com/css?family=Open+Sans');
-* { color: rgb(0, 0, 0); font: 30px "Open Sans"; align-content: center;}
-body { background-color: #2BA8E2; padding-top: 50px; align-content: center;}
-p { width: 300px; height: 39px; margin: 0px auto 0; position: relative; align-content: center;}
-p input { width: 65%; height: 100%; background-color: #fefefe; border: 3px solid #2BA8E2; outline: 0; align-content: center;}
+
+
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap');
+/* * { color: rgb(0, 0, 0); font: 30px; "Open Sans";} */
+h1 {color: var(--h1); font-size: 70px; font-weight: 100; font-family: var(--font);}
+body { background-color: var(--bg); font-weight: 100; padding-top: 50px; font-size: 30px; font-family: 'Roboto', sans-serif;}
+p { width: 300px; height: 39px; margin: 0px auto 0; position: relative; font-size: 30px; font-family: 'Roboto', sans-serif;}
+p input { width: 65%; height: 100%; font-weight: 100; background-color: var(--body); border: 3px solid var(--body); outline: 0; font-size: 30px; font-family: 'Roboto', sans-serif;}
+#wbutton { background-color: var(--orange); color: var(--bg); font-weight: 100; font-size: 30px; border-color: var(--bg); box-shadow: none; font-family: 'Roboto', sans-serif;}
+#wslug {font-family: "Roboto", sans-serif; font-weight: 100; font-size: 70px; border-top: transparent; border-left: transparent; border-right: transparent; border-bottom: transparent;}
+
+
+/* input:focus {
+    border: black;
+    background-color: transparent;
+    resize: none;
+    border-color: black;
+    outline: black;
+} */
 
 input:focus { 
     outline: none !important;
-    border-color: #719ECE;
-    box-shadow: 0 0 10px #719ECE;
+    border-color: var(--body);
+    box-shadow: 0 0 0px var(--body);
 }
-textarea:focus { 
+/* textarea:focus { 
     outline: none !important;
-    border-color: #719ECE;
-    box-shadow: 0 0 10px #719ECE;
+    border-color: var(--pink);
+    box-shadow: 0 0 10px var(--yellow);
+} */
+
+:root {
+  --bg: #ffffff;
+  --orange: #ff7b4f;
+  --h1: #000000;
+  --body: #000000;
+  --font: font-family: 'Roboto', sans-serif;
+  --yellow: #ebd619;
+  --pink: #e267c3;
 }
    
 </style>
@@ -27,22 +52,27 @@ textarea:focus {
     window.location = url;
     }
     
-
+    // restrict space https://jsfiddle.net/taditdash/hDtA3/
+    function AvoidSpace(event) {
+    var k = event ? event.which : window.event.keyCode;
+    if (k == 32) return false;
+}
    
       
 </script>
 
 <body>
 
-<!-- w3schools start https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_trigger_button_enter -->
-
 <center>
-    <b><h1 style="font-size: 70px; color: #fff;">WYR.ES/</h1></b>
+    <b><h1>WYR.ES/</h1></b>
 
-<input id="wslug" value="" placeholder="" autofocus>
+<h1>wyr.es/<input id="wslug" name="wslug" value="" placeholder="" onkeypress="return AvoidSpace(event)" autofocus spellcheck="false">
 <button id="wbutton" onclick="wslug()">GO</button>
+</h1>
+
 </center>
 
+<!-- enter key submits form https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_trigger_button_enter -->
 <script>
 var input = document.getElementById("wslug");
 input.addEventListener("keyup", function(event) {
@@ -52,7 +82,6 @@ input.addEventListener("keyup", function(event) {
   }
 });
 </script>
-<!-- w3schools end -->
 
 <!-- old form doesn't work start -->
 <!-- <form>
