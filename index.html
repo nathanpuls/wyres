@@ -2,20 +2,25 @@
 <html>
 <style>
 @import url('http://fonts.googleapis.com/css?family=Open+Sans');
-* { color: #666; font: 30px "Open Sans"; }
-body { background-color: #fafafa; padding-top: 50px; }
-p { width: 300px; height: 39px; margin: 20px auto 0; position: relative; }
-p input { width: 65%; height: 100%; padding: 0 5% 0 30%; background-color: #fefefe; border: 1px solid #eee; outline: 0; -webkit-transition: all .1s; -moz-transition: all .1s; -ms-transition: all .2s; -o-transition: all .1s; transition: all .1s; }
-p input:focus { border-color: #5fa2db; width: 90%; padding: 0 5%; }
-p label { position: absolute; top: 0; left: 14px; right: auto; height: 100%; line-height: 39px; cursor: text; -webkit-transition: all .1s; -moz-transition: all .1s; -ms-transition: all .1s; -o-transition: all .1s; transition: all .1s; z-index: 9999; }
-p input:focus + label {  background-color: #5fa2db; padding: 0 15px; color: #fff; z-index: 99999; } 
-p:nth-child(1) input:focus + label { top: -39px; left: 0; }
-p:nth-child(2) input:focus + label { left: auto; right: 100%; background-color: #5fa2db; padding: 1px 15px; color: #fff; }
-p:nth-child(3) input:focus + label { top: 41px; left: 0; }
-p:nth-child(3) input:focus + label { left: 0; }    
+* { color: rgb(0, 0, 0); font: 30px "Open Sans"; align-content: center;}
+body { background-color: #2BA8E2; padding-top: 50px; align-content: center;}
+p { width: 300px; height: 39px; margin: 0px auto 0; position: relative; align-content: center;}
+p input { width: 65%; height: 100%; background-color: #fefefe; border: 3px solid #2BA8E2; outline: 0; align-content: center;}
+
+input:focus { 
+    outline: none !important;
+    border-color: #719ECE;
+    box-shadow: 0 0 10px #719ECE;
+}
+textarea:focus { 
+    outline: none !important;
+    border-color: #719ECE;
+    box-shadow: 0 0 10px #719ECE;
+}
+   
 </style>
 <script>
-    function wclick(){
+    function wslug(){
     const site = "https://wyr.es/"
     const slug = document.getElementById("wslug").value;
     const url = site + slug;
@@ -28,11 +33,33 @@ p:nth-child(3) input:focus + label { left: 0; }
 </script>
 
 <body>
-<form>
-<p>
-wyr.es/ <br><input type="text" id="wslug" name="wslug" value="" autofocus>
-<input type="button" id="wbutton" value="go" OnClick="wclick()"/>
-</p>
+
+<!-- w3schools start https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_trigger_button_enter -->
+
+<center>
+    <b><h1 style="font-size: 70px; color: #fff;">WYR.ES/</h1></b>
+
+<input id="wslug" value="" placeholder="" autofocus>
+<button id="wbutton" onclick="wslug()">GO</button>
+</center>
+
+<script>
+var input = document.getElementById("wslug");
+input.addEventListener("keyup", function(event) {
+  if (event.keyCode === 13) {
+   event.preventDefault();
+   document.getElementById("wbutton").click();
+  }
+});
+</script>
+<!-- w3schools end -->
+
+<!-- old form doesn't work start -->
+<!-- <form>
+wyr.ess/ <br><input type="text" id="wslug" name="wslug" value="" autofocus placeholder="enter keyword">
+<input type="submit" style="display:none" />
+enter()
 </form>
+
 </body>
-</html>
+</html> -->
