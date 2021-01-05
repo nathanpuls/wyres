@@ -6,11 +6,11 @@
 <style>
 
 
-
+/* https://fonts.google.com/specimen/Roboto */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap');
 /* * { color: rgb(0, 0, 0); font: 30px; "Open Sans";} */
 h1 {color: var(--h1); font-size: 90px; font-weight: 100; font-family: var(--font);}
-body { background-color: var(--bg); font-weight: 100; padding-top: 120px; font-size: 30px; font-family: 'Roboto', sans-serif;}
+body { background-color: var(--bg); font-weight: 100; padding-top: 50px; font-size: 30px; font-family: 'Roboto', sans-serif;}
 p { width: 300px; height: 39px; margin: 0px auto 0; position: relative; font-size: 30px; font-family: 'Roboto', sans-serif;}
 p input { width: 65%; height: 100%; font-weight: 100; background-color: var(--body); border: 3px solid var(--body); outline: 0; font-size: 30px; font-family: 'Roboto', sans-serif;}
 #wbutton { background-color: var(--orange); color: var(--bg); font-weight: 100; font-size: 90px; border-color: var(--bg); box-shadow: none; font-family: 'Roboto', sans-serif;}
@@ -36,6 +36,7 @@ input:focus {
     box-shadow: 0 0 10px var(--yellow);
 } */
 
+/* https://www.w3schools.com/css/css3_variables.asp */
 :root {
   --bg: #ffffff;
   --orange: #ff7b4f;
@@ -46,6 +47,7 @@ input:focus {
   --pink: #e267c3;
 }
 
+/* https://stackoverflow.com/questions/29806273/removing-blue-border-in-form-submit-button */
 #wbutton:focus {
       outline: none;
 }
@@ -70,14 +72,15 @@ input:focus {
 
 <body>
 
-<center>
+<!-- <center> -->
     <!-- <b><h1>WYR.ES/</h1></b> -->
+    <!-- https://stackoverflow.com/questions/11100041/how-do-you-automatically-set-text-box-to-uppercase -->
 
-<h1>wyr.es/<input id="wslug" name="wslug" value="" placeholder="" onkeypress="return AvoidSpace(event)" autofocus spellcheck="false">
+<h1>&nbsp;&nbsp;wyr.es/<input id="wslug" name="wslug" value="" placeholder="" onkeypress="return AvoidSpace(event)" autofocus spellcheck="false" style="text-transform:lowercase">
 <button id="wbutton" onclick="wslug()">&nbsp;>&nbsp;</button>
 </h1>
 
-</center>
+<!-- </center> -->
 
 <!-- enter key submits form https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_trigger_button_enter -->
 <script>
