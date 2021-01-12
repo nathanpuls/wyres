@@ -85,7 +85,7 @@ input:focus {
     <!-- https://stackoverflow.com/questions/11100041/how-do-you-automatically-set-text-box-to-uppercase -->
 
 <div class="centered">
-<h1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wyr.es/<input id="wslug" name="wslug" value="" placeholder="" onkeypress="return AvoidSpace(event)" autofocus spellcheck="false" style="text-transform:lowercase">
+<h1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wyr.es/<input id="wslug" name="wslug" value="" placeholder="" onkeypress="return AvoidSpace(event)" autocomplete="off" autofocus spellcheck="false" style="text-transform:lowercase">
 <br>
 <button id="wbutton" onclick="wslug()">&nbsp;>&nbsp;</button>
 </h1>
@@ -105,12 +105,32 @@ input.addEventListener("keyup", function(event) {
 });
 </script>
 
+<!--autofocus for iphone?-->
+<script>
+(function($, M) {
+    // media query for minimum of 1024 pixel device width (iPad is 960 CSS pixels)
+    if(M.mq('only all and (min-width: 961px)')) {
+        $(function jqueryAutofocus() {
+            // automatically focus the search field
+            $('#header-search [name="q"]').focus();
+        });
+    }
+})(window.jQuery, window.Modernizr);
+</script>
+
+<!--attempt to reset form - does not work
+<script>
+function resetAfter() {
+  document.getElementById("wslug").reset();
+}
+</script>
+-->
+
 <!-- old form doesn't work start -->
 <!-- <form>
 wyr.ess/ <br><input type="text" id="wslug" name="wslug" value="" autofocus placeholder="enter keyword">
 <input type="submit" style="display:none" />
 enter()
 </form>
-
 </body>
 </html> -->
