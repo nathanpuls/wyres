@@ -6,16 +6,35 @@
 <style>
 
 
+body {
+    background-color: rgb(189,195,199);
+    font-family: 'Open Sans', sans-serif;
+}
+
+
 /* https://fonts.google.com/specimen/Roboto */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap');
 /* * { color: rgb(0, 0, 0); font: 30px; "Open Sans";} */
-h1 {color: var(--h1); font-size: 6vw; font-weight: 300; font-family: var(--font);}
-body { background-color: var(--bg); font-weight: 100; padding-top: 50px; font-size: 30px; font-family: 'Roboto', sans-serif;}
-p { width: 300px; height: 39px; margin: 0px auto 0; position: relative; font-size: 30px; font-family: 'Roboto', sans-serif;}
-p input { width: 65%; height: 100%; font-weight: 100; background-color: var(--body); border: 3px solid var(--body); outline: 0; font-size: 30px; font-family: 'Roboto', sans-serif;}
-#wbutton { background-color: var(--orange); height: 50%; width: 100%; height: 1500px; color: var(--bg); font-weight: 100; font-size: 12vw; font-weight: 500; border-color: var(--bg); box-shadow: none; font-family: 'Roboto', sans-serif;}
-#wslug {width: 60%; font-family: "Roboto", sans-serif; font-weight: 100; font-size: 6vw; border-top: transparent; border-left: transparent; border-right: transparent; border-bottom: transparent;}
+h1 {color: var(--h1); font-size: /*6*/10vw; font-weight: 300; font-family: var(--font);}
+body { background-color: var(--bg); font-weight: 100; padding-top: 0px; font-size: 30px; font-family: 'Roboto', sans-serif;
 
+
+
+
+
+
+
+
+}
+p { width: 300px; height: 39px; margin: 0px auto 0; position: relative; font-size: 30px; font-family: 'Roboto', sans-serif;}
+/*p input { width: 65%; height: 100%; font-weight: 100; background-color: var(--input); border: 3px solid var(--body); outline: 0; font-size: 30px; font-family: 'Roboto', sans-serif;}*/
+#wbutton { display: none; background-color: var(--orange); height: 50%; width: 100%; height: 100px; color: var(--bg); font-weight: 100; font-size: 8vw; font-weight: 500; border-color: var(--bg); box-shadow: none; font-family: 'Roboto', sans-serif;}
+#wslug {color: var(--slug); background: white; width: 50%; font-family: "Roboto", sans-serif; font-weight: 300; font-size: /*6*/8vw; border-top: transparent; border-left: transparent; border-right: transparent; border-bottom: 2px dotted var(--theme);}
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: var(--orange);
+  opacity: 1; /* Firefox */
+}
 
 /* input:focus {
     border: black;
@@ -39,12 +58,18 @@ input:focus {
 /* https://www.w3schools.com/css/css3_variables.asp */
 :root {
   --bg: #ffffff;
+  --blue: #2BA8E2;
+  --theme: var(--orange);
   --orange: #ff7b4f;
-  --h1: #000000;
+  --h1: rgb(61, 61, 61);/*#000000;*/
   --body: #000000;
   --font: font-family: 'Roboto', sans-serif;
   --yellow: #ebd619;
   --pink: #e267c3;
+  --slug: var(--theme);
+ 
+  --slugsize: 
+  
 }
 
 /* https://stackoverflow.com/questions/29806273/removing-blue-border-in-form-submit-button */
@@ -58,6 +83,11 @@ input:focus {
   left: 50%;
   /* margin-top: -50px;
   margin-left: -100px; */
+}
+
+input {
+  /* custom */
+  caret-color: var(--theme);
 }
 
 </style>
@@ -79,13 +109,16 @@ input:focus {
 </script>
 
 <body>
+  
+ 
 
 <!-- <center> -->
     <!-- <b><h1>WYR.ES/</h1></b> -->
     <!-- https://stackoverflow.com/questions/11100041/how-do-you-automatically-set-text-box-to-uppercase -->
 
 <div class="centered">
-<h1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wyr.es/<input id="wslug" name="wslug" value="" placeholder="" onkeypress="return AvoidSpace(event)" autocomplete="off" autofocus spellcheck="false" style="text-transform:lowercase">
+<!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+<h1>&nbsp;wyr.es/<input id="wslug" name="wslug" value="" placeholder="" onkeypress="return AvoidSpace(event)" autocomplete="off" autofocus spellcheck="false" style="text-transform:lowercase">
 <br>
 <button id="wbutton" onclick="wslug()">&nbsp;>&nbsp;</button>
 </h1>
