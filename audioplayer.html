@@ -24,7 +24,10 @@
 	 font-family: lato, serif, sans-serif; /*arial, helvetica, sans-serif;*/
 	 font-size: 1em;
 	 margin: 0 auto;
+   padding: 15px;
 	 width: 500px;
+   border: 1px /*change from 1px*/ solid #d9d9d9;
+
 }
  body .container .player {
 	 height: 60px;
@@ -54,8 +57,9 @@
 	}
 }
  body .container .player .large-toggle-btn {
-	 border: 1px solid #d9d9d9;
+	 border: 0px /*change from 1px*/ solid #d9d9d9; 
 	 border-radius: 2px;
+   color: #008acb; /*change from black*/
 	 float: left;
 	 font-size: 1.5em;
 	 height: 50px;
@@ -100,6 +104,7 @@
 	 visibility: hidden;
 	 width: 400px;
 	 *zoom: 1;
+
 }
  body .container .player .info-box .track-info-box .track-title-text {
 	 display: inline-block;
@@ -204,8 +209,9 @@
 	 text-decoration: underline;
 }
  body .container .play-list .play-list-row .small-toggle-btn {
-	 border: 1px solid #d9d9d9;
+	 border: 0px /*change from 1px*/ solid #d9d9d9;
 	 border-radius: 2px;
+   color: #008acb; /*change from black*/
 	 cursor: pointer;
 	 display: inline-block;
 	 height: 20px;
@@ -240,14 +246,19 @@
 	 text-decoration: none;
 }
  body .container .play-list .play-list-row .track-title .playlist-track:hover {
-	 text-decoration: underline;
+	 text-decoration: none; /* changed from underline */
+   /*font-weight: bold;*/
+   color: #008acb;
 }
  body .container .play-list .play-list-row .track-title.active-track {
-	 font-weight: bold;
+	 color: #008acb;
+   font-weight: bold; 
+   /*font-size: 30px;*/
 }
  body .container .play-list .play-list-row:before, body .container .play-list .play-list-row:after {
 	 content: " ";
 	 display: table;
+   
 }
  body .container .play-list .play-list-row:after {
 	 clear: both;
@@ -255,6 +266,7 @@
 	 font-size: 0;
 	 height: 0;
 	 visibility: hidden;
+   
 }
  
  
