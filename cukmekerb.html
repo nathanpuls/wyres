@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make Short Links</title>
+</head>
+<body>
+    URL:<input type="text" id="box">Slashtag:<input type="text" id="slashtag">
+    <button onclick="makelink(document.getElementById('box').value, document.getElementById('slashtag').value)">Shorten</button>  
+    <div id="output"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>  
+    <script>
+        var data;
+        function makelink(q, slash) {
+            $.ajax({
+                url:"https://api.rebrandly.com/v1/links/new?apikey=REPLACE_WITH_YOUR_API_KEY&destination="+q+"&slashtag="+slash+"&domain[fullName]=rebrand.ly",
+                success: function(rawdata) {
+                    var rawstring = JSON.stringify(rawdata);
+                    data = JSON.parse(rawstring);
+                    document.getElementById('output').innerHTML="<a href='https://"+data.shortUrl+"' target='_blank'>"+data.shortUrl+"</a>";
+                }})};
+    </script>
