@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Import CSV → wyres</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-100 min-h-screen p-6">
+  <div class="max-w-3xl mx-auto bg-white rounded-xl shadow p-6">
+    <h1 class="text-2xl font-semibold mb-4">Import Short.io CSV</h1>
+
+    <input
+      type="file"
+      id="file"
+      accept=".csv"
+      class="block mb-4"
+    >
+
+    <button
+      id="importBtn"
+      class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+    >
+      Import
+    </button>
+
+    <pre
+      id="log"
+      class="mt-4 text-sm bg-slate-50 border rounded p-3 h-80 overflow-auto"
+    ></pre>
+  </div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+/* ================= FIREBASE ================= */
+firebase.initializeApp({
+  apiKey: "AIzaSyDFP5GAwTNqLyaySh_t_2j8NFiulHTeFy8",
+  authDomain: "fwdng-1d5f9.firebaseapp.com",
+  databaseURL: "https://fwdng-1d5f9.firebaseio.com",
+  projectId: "fwdng-1d5f9",
+  storageBucket: "fwdng-1d5f9.firebasestorage.app",
+  messagingSenderId: "250477002363",
+  appId: "1:250477002363:web:95a89409c8d5991a9aacde"
+});
+
+const db = firebase.database();
+const logEl = document.getElementById("log");
+const log = msg => logEl.textContent += msg + "\n";
+
+/* ================= HELPERS ================= */
+function normalizeUrl(url) {
+  if (!url) return null;
+
+  // Fix weird http:/// cases
+  url = url.replace(/^https?:\/{3,}/i, match =>
+    match.startsWith("https") ? "https://" : "http://"
+  );
+
+  if (!/^https?:\/\//i.test(url)) {
+    url = "https://" + url;
+  }
+  return url;
+}
+
+// Simple CSV parser (handles quoted commas)
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let value = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const next = text[i + 1];
+
+    if (char === '"' && inQuotes && next === '"') {
+      value += '"';
+      i++;
+    } else if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === "," && !inQuotes) {
+      row.push(value);
+      value = "";
+    } else if ((char === "\n" || char === "\r") && !inQuotes) {
+      if (value || row.length) {
+        row.push(value);
+        rows.push(row);
+        row = [];
+        value = "";
+      }
+    } else {
+      value += char;
+    }
+  }
+
+  if (value || row.length) {
+    row.push(value);
+    rows.push(row);
+  }
+
+  return rows;
+}
+
+/* ================= IMPORT ================= */
+document.getElementById("importBtn").onclick = async () => {
+  const file = document.getElementById("file").files[0];
+  if (!file) {
+    alert("Select a CSV file first");
+    return;
+  }
+
+  logEl.textContent = "";
+  log("Reading file…");
+
+  const text = await file.text();
+  const rows = parseCSV(text);
+
+  const headers = rows.shift().map(h => h.trim().toLowerCase());
+
+  const pathIndex = headers.indexOf("path");
+  const urlIndex = headers.indexOf("original url");
+  const createdIndex = headers.indexOf("created at");
+  const updatedIndex = headers.indexOf("updated at");
+
+  if (pathIndex === -1 || urlIndex === -1) {
+    alert("CSV must include Path and Original URL columns");
+    return;
+  }
+
+  let imported = 0;
+
+  for (const row of rows) {
+    let alias = row[pathIndex]?.trim();
+    let longUrl = normalizeUrl(row[urlIndex]?.trim());
+
+    if (!alias || !longUrl) continue;
+    if (alias === "/") continue; // skip root
+
+    const data = {
+      alias,
+      longUrl,
+      createdAt: row[createdIndex] || null,
+      updatedAt: row[updatedIndex] || null,
+      importedAt: Date.now()
+    };
+
+    await db.ref("wyres/" + alias).set(data);
+    log(`Imported: ${alias}`);
+    imported++;
+  }
+
+  log(`\n✅ Done — ${imported} links imported`);
+};
+</script>
+</body>
+</html>

@@ -1,169 +1,142 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>wyr.es</title>
-    </head>
-<style>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Wyr.es</title>
+<script src="https://cdn.tailwindcss.com"></script>
 
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col items-center justify-center">
 
-body {
-    background-color: rgb(189,195,199);
-    font-family: 'Open Sans', sans-serif;
-}
+  <!-- Title -->
+  <h1 class="text-6xl font-light ld mb-8">wyr.es</h1>
 
+  <!-- Search -->
+  <div class="w-full max-w-xl relative">
+    <input id="searchInput" type="text" placeholder=""
+      class="w-full rounded-lg border px-4 py-3 text-lg focus:outline-none" autofocus autocomplete="off" />
 
-/* https://fonts.google.com/specimen/Roboto */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap');
-/* * { color: rgb(0, 0, 0); font: 30px; "Open Sans";} */
-h1 {color: var(--h1); font-size: /*6*/10vw; font-weight: 300; font-family: var(--font);}
-body { background-color: var(--bg); font-weight: 100; padding-top: 0px; font-size: 30px; font-family: 'Roboto', sans-serif;
+    <!-- Suggestions dropdown -->
+    <ul id="suggestions" class="absolute bg-white w-full mt-1 rounded-lg shadow divide-y hidden z-10"></ul>
+  </div>
 
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
+  <script>
+    // Initialize Firebase
+    firebase.initializeApp({
+      apiKey: "AIzaSyDFP5GAwTNqLyaySh_t_2j8NFiulHTeFy8",
+      authDomain: "fwdng-1d5f9.firebaseapp.com",
+      databaseURL: "https://fwdng-1d5f9.firebaseio.com",
+      projectId: "fwdng-1d5f9",
+      storageBucket: "fwdng-1d5f9.firebasestorage.app",
+      messagingSenderId: "250477002363",
+      appId: "1:250477002363:web:95a89409c8d5991a9aacde"
+    });
 
+    const db = firebase.database();
+    let allAliases = [];
 
-
-
-
-
-}
-p { width: 300px; height: 39px; margin: 0px auto 0; position: relative; font-size: 30px; font-family: 'Roboto', sans-serif;}
-/*p input { width: 65%; height: 100%; font-weight: 100; background-color: var(--input); border: 3px solid var(--body); outline: 0; font-size: 30px; font-family: 'Roboto', sans-serif;}*/
-#wbutton { display: none; background-color: var(--orange); height: 50%; width: 100%; height: 100px; color: var(--bg); font-weight: 100; font-size: 8vw; font-weight: 500; border-color: var(--bg); box-shadow: none; font-family: 'Roboto', sans-serif;}
-#wslug {color: var(--slug); background: white; width: 50%; font-family: "Roboto", sans-serif; font-weight: 300; font-size: /*6*/8vw; border-top: transparent; border-left: transparent; border-right: transparent; border-bottom: 2px dotted var(--theme);}
-
-::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-  color: var(--orange);
-  opacity: 1; /* Firefox */
-}
-
-/* input:focus {
-    border: black;
-    background-color: transparent;
-    resize: none;
-    border-color: black;
-    outline: black;
-} */
-
-input:focus { 
-    outline: none !important;
-    border-color: var(--body);
-    box-shadow: 0 0 0px var(--body);
-}
-/* textarea:focus { 
-    outline: none !important;
-    border-color: var(--pink);
-    box-shadow: 0 0 10px var(--yellow);
-} */
-
-/* https://www.w3schools.com/css/css3_variables.asp */
-:root {
-  --bg: #ffffff;
-  --blue: #2BA8E2;
-  --theme: var(--orange);
-  --orange: #ff7b4f;
-  --h1: rgb(61, 61, 61);/*#000000;*/
-  --body: #000000;
-  --font: font-family: 'Roboto', sans-serif;
-  --yellow: #ebd619;
-  --pink: #e267c3;
-  --slug: var(--theme);
- 
-  --slugsize: 
-  
-}
-
-/* https://stackoverflow.com/questions/29806273/removing-blue-border-in-form-submit-button */
-#wbutton:focus {
-      outline: none;
-}
-
-.centered {
-  /* position: fixed; */
-  top: 50%;
-  left: 50%;
-  /* margin-top: -50px;
-  margin-left: -100px; */
-}
-
-input {
-  /* custom */
-  caret-color: var(--theme);
-}
-
-</style>
-<script>
-    function wslug(){
-    const site = "https://wyr.es/"
-    const slug = document.getElementById("wslug").value;
-    const url = site + slug;
-    window.location = url;
+    async function loadAliases() {
+      const snap = await db.ref("wyres").get();
+      allAliases = snap.exists() ? Object.values(snap.val()) : [];
     }
-    
-    // restrict space https://jsfiddle.net/taditdash/hDtA3/
-    function AvoidSpace(event) {
-    var k = event ? event.which : window.event.keyCode;
-    if (k == 32) return false;
-}
-   
-      
-</script>
 
-<body>
-  
- 
+    loadAliases();
 
-<!-- <center> -->
-    <!-- <b><h1>WYR.ES/</h1></b> -->
-    <!-- https://stackoverflow.com/questions/11100041/how-do-you-automatically-set-text-box-to-uppercase -->
+    const searchInput = document.getElementById("searchInput");
+    const suggestions = document.getElementById("suggestions");
+    let selectedIndex = -1;
 
-<div class="centered">
-<!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
-<h1>&nbsp;wyr.es/<input id="wslug" name="wslug" value="" placeholder="" onkeypress="return AvoidSpace(event)" autocomplete="off" autofocus spellcheck="false" style="text-transform:lowercase">
-<br>
-<button id="wbutton" onclick="wslug()">&nbsp;>&nbsp;</button>
-</h1>
+    function renderSuggestions(matches) {
+      suggestions.innerHTML = matches.map((a, idx) => `
+        <li class="px-4 py-2 hover:bg-blue-100 cursor-pointer ${idx === selectedIndex ? 'bg-blue-200' : ''}" data-index="${idx}">
+          ${a.alias}
+        </li>
+      `).join("");
+      suggestions.classList.remove("hidden");
 
-</div>
-
-<!-- </center> -->
-
-<!-- enter key submits form https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_trigger_button_enter -->
-<script>
-var input = document.getElementById("wslug");
-input.addEventListener("keyup", function(event) {
-  if (event.keyCode === 13) {
-   event.preventDefault();
-   document.getElementById("wbutton").click();
-  }
-});
-</script>
-
-<!--autofocus for iphone?-->
-<script>
-(function($, M) {
-    // media query for minimum of 1024 pixel device width (iPad is 960 CSS pixels)
-    if(M.mq('only all and (min-width: 961px)')) {
-        $(function jqueryAutofocus() {
-            // automatically focus the search field
-            $('#header-search [name="q"]').focus();
-        });
+      Array.from(suggestions.children).forEach((li, idx) => {
+        li.onclick = () => {
+          window.location.href = `https://wyr.es/${matches[idx].alias}`;
+        };
+      });
     }
-})(window.jQuery, window.Modernizr);
-</script>
 
-<!--attempt to reset form - does not work
-<script>
-function resetAfter() {
-  document.getElementById("wslug").reset();
-}
-</script>
--->
+    function updateHighlight() {
+      Array.from(suggestions.children).forEach((li, idx) => {
+        li.classList.toggle("bg-blue-200", idx === selectedIndex);
+      });
+    }
 
-<!-- old form doesn't work start -->
-<!-- <form>
-wyr.ess/ <br><input type="text" id="wslug" name="wslug" value="" autofocus placeholder="enter keyword">
-<input type="submit" style="display:none" />
-enter()
-</form>
+    searchInput.addEventListener("input", () => {
+      const q = searchInput.value.toLowerCase().trim();
+      if (!q) {
+        suggestions.classList.add("hidden");
+        suggestions.innerHTML = "";
+        selectedIndex = -1;
+        return;
+      }
+
+      const matches = allAliases
+        .filter(a => a.alias.toLowerCase().includes(q))
+        .sort((a, b) => {
+          const aliasA = a.alias.toLowerCase();
+          const aliasB = b.alias.toLowerCase();
+
+          // Exact match first
+          if (aliasA === q) return -1;
+          if (aliasB === q) return 1;
+
+          // Prefix match second
+          if (aliasA.startsWith(q) && !aliasB.startsWith(q)) return -1;
+          if (!aliasA.startsWith(q) && aliasB.startsWith(q)) return 1;
+
+          // Alphabetical otherwise
+          return aliasA.localeCompare(aliasB);
+        })
+        .slice(0, 10);
+
+      selectedIndex = -1;
+      if (matches.length > 0) renderSuggestions(matches);
+      else {
+        suggestions.classList.add("hidden");
+        suggestions.innerHTML = "";
+      }
+    });
+
+    searchInput.addEventListener("keydown", (e) => {
+      const items = suggestions.children;
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        if (!items.length) return;
+        selectedIndex = (selectedIndex + 1) % items.length;
+        updateHighlight();
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        if (!items.length) return;
+        selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+        updateHighlight();
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (selectedIndex >= 0) {
+          // Go to highlighted suggestion
+          window.location.href = `https://wyr.es/${items[selectedIndex].textContent.trim()}`;
+        } else {
+          // No suggestion highlighted → use typed value
+          const typed = searchInput.value.trim();
+          if (typed) window.location.href = `https://wyr.es/${typed}`;
+        }
+      }
+    });
+
+    // Close suggestions on click outside
+    document.addEventListener("click", e => {
+      if (!searchInput.contains(e.target) && !suggestions.contains(e.target)) {
+        suggestions.classList.add("hidden");
+      }
+    });
+  </script>
 </body>
-</html> -->
+</html>

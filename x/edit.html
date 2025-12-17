@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Wyr.es URL Shortener</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-100 text-slate-800 min-h-screen">
+<div class="max-w-5xl mx-auto p-6">
+
+<h1 class="text-3xl font-semibold mb-8">Wyr.es URL Shortener</h1>
+
+<!-- Add Link -->
+<div class="bg-white rounded-xl shadow p-6 mb-10">
+  <h2 class="text-xl font-medium mb-4">Add a New Link</h2>
+
+  <form id="addForm" class="space-y-4">
+    <input id="longUrl" placeholder="Long URL"
+      class="w-full rounded-lg border px-3 py-2" required>
+
+    <input id="customAlias" placeholder="Custom alias (optional)"
+      class="w-64 rounded-lg border px-3 py-2">
+
+    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+      Add Link
+    </button>
+  </form>
+
+  <p id="result" class="mt-3 text-green-600 text-sm"></p>
+</div>
+
+<!-- View / Edit -->
+<div class="bg-white rounded-xl shadow p-6">
+  <div class="flex justify-between mb-4">
+    <h2 class="text-xl font-medium">View & Edit Links</h2>
+    <input id="search" placeholder="Search…"
+      class="w-72 rounded-lg border px-3 py-2">
+  </div>
+
+  <table class="w-full border">
+    <thead class="bg-slate-50">
+      <tr>
+        <th class="p-3 text-left">Alias</th>
+        <th class="p-3 text-left">Long URL</th>
+        <th class="p-3 w-12"></th>
+      </tr>
+    </thead>
+    <tbody id="linkList" class="divide-y"></tbody>
+  </table>
+</div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyDFP5GAwTNqLyaySh_t_2j8NFiulHTeFy8",
+  authDomain: "fwdng-1d5f9.firebaseapp.com",
+  databaseURL: "https://fwdng-1d5f9.firebaseio.com",
+  projectId: "fwdng-1d5f9",
+  storageBucket: "fwdng-1d5f9.firebasestorage.app",
+  messagingSenderId: "250477002363",
+  appId: "1:250477002363:web:95a89409c8d5991a9aacde"
+});
+
+const db = firebase.database();
+const RESERVED = ["X"];
+let links = [];
+let debounceTimers = {};
+
+function normalizeUrl(url) {
+  if (!/^https?:\/\//i.test(url)) return "https://" + url;
+  return url;
+}
+
+document.getElementById("addForm").onsubmit = async e => {
+  e.preventDefault();
+
+  let url = normalizeUrl(longUrl.value.trim());
+  let alias = customAlias.value.trim() ||
+    Math.random().toString(36).slice(2, 8);
+
+  if (RESERVED.includes(alias)) return alert("Alias reserved");
+  if ((await db.ref("wyres/" + alias).get()).exists())
+    return alert("Alias exists");
+
+  await db.ref("wyres/" + alias).set({
+    alias,
+    longUrl: url,
+    created: Date.now()
+  });
+
+  result.textContent = `https://wyr.es/${alias}`;
+  addForm.reset();
+  loadLinks();
+};
+
+function render(list) {
+  linkList.innerHTML = "";
+
+  list.forEach(item => {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td class="p-3">
+        <input class="border rounded px-2 py-1 w-40" value="${item.alias}">
+      </td>
+      <td class="p-3">
+        <input class="border rounded px-2 py-1 w-full" value="${item.longUrl}">
+      </td>
+      <td class="p-3 text-center">
+        <button title="Delete" class="text-red-600 hover:text-red-800">
+          🗑️
+        </button>
+      </td>
+    `;
+
+    const [aliasInput, urlInput] = tr.querySelectorAll("input");
+    const delBtn = tr.querySelector("button");
+
+    const scheduleUpdate = () => {
+      clearTimeout(debounceTimers[item.alias]);
+      debounceTimers[item.alias] = setTimeout(async () => {
+        let newAlias = aliasInput.value.trim();
+        let newUrl = normalizeUrl(urlInput.value.trim());
+
+        if (!newAlias || !newUrl) return;
+
+        if (newAlias !== item.alias) {
+          if (RESERVED.includes(newAlias)) return alert("Alias reserved");
+          if ((await db.ref("wyres/" + newAlias).get()).exists())
+            return alert("Alias exists");
+
+          await db.ref("wyres/" + newAlias).set({
+            ...item,
+            alias: newAlias,
+            longUrl: newUrl
+          });
+          await db.ref("wyres/" + item.alias).remove();
+        } else {
+          await db.ref("wyres/" + item.alias).update({
+            longUrl: newUrl
+          });
+        }
+
+        loadLinks();
+      }, 500);
+    };
+
+    aliasInput.oninput = scheduleUpdate;
+    urlInput.oninput = scheduleUpdate;
+
+    delBtn.onclick = async () => {
+      if (!confirm(`Delete "${item.alias}"?`)) return;
+      await db.ref("wyres/" + item.alias).remove();
+      search.value = "";        // ✅ clear search
+      loadLinks();
+    };
+
+    linkList.appendChild(tr);
+  });
+}
+
+async function loadLinks() {
+  const snap = await db.ref("wyres").get();
+  links = snap.exists() ? Object.values(snap.val()) : [];
+  render(links);
+}
+
+search.oninput = () => {
+  const q = search.value.toLowerCase();
+  render(links.filter(l =>
+    l.alias.toLowerCase().includes(q) ||
+    l.longUrl.toLowerCase().includes(q)
+  ));
+};
+
+loadLinks();
+</script>
+</body>
+</html>
