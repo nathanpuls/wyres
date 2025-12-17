@@ -9,43 +9,51 @@
     box-sizing: border-box;
   }
 
-  body {
+  html, body {
     margin: 0;
+    padding: 0;
+    height: 100%;
     font-family: system-ui, sans-serif;
     background-color: #f1f5f9;
     color: #1e293b;
-    min-height: 100vh;
+  }
+
+  body {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start; /* align to top */
     align-items: center;
+    padding: 2vh 2vw;
+    overflow-x: hidden; /* prevent horizontal overflow */
   }
 
   h1 {
     font-weight: 300;
-    font-size: 4rem;
-    margin-bottom: 1rem;
+    font-size: clamp(4vh, 10vw, 10vh); /* responsive, never too big */
+    margin: 2vh 0;
     text-align: center;
+    word-break: break-word;
   }
 
   .search-container {
-    width: 90%;
-    max-width: 400px;
+    width: 100%;
+    max-width: 600px; /* ensure it never exceeds screen width */
     position: relative;
+    margin-bottom: 2vh;
   }
 
   #searchInput {
     width: 100%;
-    padding: 1.2rem 1.5rem; /* bigger height */
-    font-size: 1.5rem;      /* bigger text */
-    border-radius: 12px;
+    max-width: 100%; /* never overflow screen */
+    padding: 2.5vh 2vw;
+    font-size: 4vh;
+    border-radius: 16px;
     border: 1px solid #cbd5e1;
   }
 
-    #searchInput:focus {
-        outline: none;
-        border-color: none;
-    }
+  #searchInput:focus {
+    outline: none;
+  }
 
   #suggestions {
     position: absolute;
@@ -58,14 +66,15 @@
     margin-top: 0.5rem;
     padding: 0;
     list-style: none;
-    max-height: 300px;
+    max-height: 50vh; /* allow scrolling if too many items */
     overflow-y: auto;
     display: none;
     z-index: 10;
+    font-size: 4vh; /* match search input font size */
   }
 
   #suggestions li {
-    padding: 1rem;
+    padding: 2vh 2vw; /* match input height for easy tapping */
     cursor: pointer;
   }
 
@@ -74,22 +83,23 @@
     background-color: #dbeafe;
   }
 
+  /* Larger screens */
   @media (min-width: 600px) {
-    .search-container {
-      max-width: 500px;
-    }
-
     h1 {
-      font-size: 5rem;
+      font-size: clamp(5vh, 8vw, 12vh);
     }
 
     #searchInput {
-      font-size: 1.8rem;
-      padding: 1.5rem 2rem;
+      font-size: 5vh;
+      padding: 3vh 2vw;
+    }
+
+    #suggestions {
+      font-size: 5vh;
     }
 
     #suggestions li {
-      padding: 1.2rem;
+      padding: 1.5vh 1vw;
     }
   }
 </style>
@@ -107,7 +117,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <script>
-    // Initialize Firebase
     firebase.initializeApp({
       apiKey: "AIzaSyDFP5GAwTNqLyaySh_t_2j8NFiulHTeFy8",
       authDomain: "fwdng-1d5f9.firebaseapp.com",
