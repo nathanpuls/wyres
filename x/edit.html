@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Wyr.es URL Shortener</title>
+<title>wyr.es URL Shortener</title>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -156,7 +156,7 @@ function render(list) {
     delBtn.onclick = async () => {
       if (!confirm(`Delete "${item.alias}"?`)) return;
       await db.ref("wyres/" + item.alias).remove();
-      search.value = "";        // ✅ clear search
+      search.value = "";
       loadLinks();
     };
 
@@ -171,11 +171,37 @@ async function loadLinks() {
 }
 
 search.oninput = () => {
-  const q = search.value.toLowerCase();
-  render(links.filter(l =>
-    l.alias.toLowerCase().includes(q) ||
-    l.longUrl.toLowerCase().includes(q)
-  ));
+  const q = search.value.toLowerCase().trim();
+
+  if (!q) {
+    render(links);
+    return;
+  }
+
+  const matches = links
+    .filter(l =>
+      l.alias.toLowerCase().includes(q) ||
+      l.longUrl.toLowerCase().includes(q)
+    )
+    .sort((a, b) => {
+      const aliasA = a.alias.toLowerCase();
+      const aliasB = b.alias.toLowerCase();
+
+      // 1️⃣ Exact match comes first
+      if (aliasA === q) return -1;
+      if (aliasB === q) return 1;
+
+      // 2️⃣ Prefix match next
+      const aStarts = aliasA.startsWith(q);
+      const bStarts = aliasB.startsWith(q);
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
+
+      // 3️⃣ Otherwise, alphabetically
+      return aliasA.localeCompare(aliasB);
+    });
+
+  render(matches);
 };
 
 loadLinks();
