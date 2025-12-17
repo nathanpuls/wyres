@@ -3,21 +3,104 @@
 <head>
 <meta charset="UTF-8">
 <title>wyr.es</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* Reset some basic styles */
+  * {
+    box-sizing: border-box;
+  }
 
+  body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    background-color: #f1f5f9;
+    color: #1e293b;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  h1 {
+    font-weight: 300;
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .search-container {
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+  }
+
+  #searchInput {
+    width: 100%;
+    padding: 1.2rem 1.5rem; /* bigger height */
+    font-size: 1.5rem;      /* bigger text */
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+  }
+
+    #searchInput:focus {
+        outline: none;
+        border-color: none;
+    }
+
+  #suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-top: 0.5rem;
+    padding: 0;
+    list-style: none;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+    z-index: 10;
+  }
+
+  #suggestions li {
+    padding: 1rem;
+    cursor: pointer;
+  }
+
+  #suggestions li:hover,
+  #suggestions li.active {
+    background-color: #dbeafe;
+  }
+
+  @media (min-width: 600px) {
+    .search-container {
+      max-width: 500px;
+    }
+
+    h1 {
+      font-size: 5rem;
+    }
+
+    #searchInput {
+      font-size: 1.8rem;
+      padding: 1.5rem 2rem;
+    }
+
+    #suggestions li {
+      padding: 1.2rem;
+    }
+  }
+</style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col items-center justify-center">
+<body>
 
-  <!-- Title -->
-  <h1 class="text-6xl font-light ld mb-8">wyr.es</h1>
+  <h1>wyr.es</h1>
 
-  <!-- Search -->
-  <div class="w-full max-w-xl relative">
-    <input id="searchInput" type="text" placeholder=""
-      class="w-full rounded-lg border px-4 py-3 text-lg focus:outline-none" autofocus autocomplete="off" />
-
-    <!-- Suggestions dropdown -->
-    <ul id="suggestions" class="absolute bg-white w-full mt-1 rounded-lg shadow divide-y hidden z-10"></ul>
+  <div class="search-container">
+    <input id="searchInput" type="text" placeholder="" autofocus autocomplete="off" />
+    <ul id="suggestions"></ul>
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -51,11 +134,11 @@
 
     function renderSuggestions(matches) {
       suggestions.innerHTML = matches.map((a, idx) => `
-        <li class="px-4 py-2 hover:bg-blue-100 cursor-pointer ${idx === selectedIndex ? 'bg-blue-200' : ''}" data-index="${idx}">
+        <li class="${idx === selectedIndex ? 'active' : ''}" data-index="${idx}">
           ${a.alias}
         </li>
       `).join("");
-      suggestions.classList.remove("hidden");
+      suggestions.style.display = matches.length ? "block" : "none";
 
       Array.from(suggestions.children).forEach((li, idx) => {
         li.onclick = () => {
@@ -66,14 +149,14 @@
 
     function updateHighlight() {
       Array.from(suggestions.children).forEach((li, idx) => {
-        li.classList.toggle("bg-blue-200", idx === selectedIndex);
+        li.classList.toggle("active", idx === selectedIndex);
       });
     }
 
     searchInput.addEventListener("input", () => {
       const q = searchInput.value.toLowerCase().trim();
       if (!q) {
-        suggestions.classList.add("hidden");
+        suggestions.style.display = "none";
         suggestions.innerHTML = "";
         selectedIndex = -1;
         return;
@@ -84,26 +167,16 @@
         .sort((a, b) => {
           const aliasA = a.alias.toLowerCase();
           const aliasB = b.alias.toLowerCase();
-
-          // Exact match first
           if (aliasA === q) return -1;
           if (aliasB === q) return 1;
-
-          // Prefix match second
           if (aliasA.startsWith(q) && !aliasB.startsWith(q)) return -1;
           if (!aliasA.startsWith(q) && aliasB.startsWith(q)) return 1;
-
-          // Alphabetical otherwise
           return aliasA.localeCompare(aliasB);
         })
         .slice(0, 10);
 
       selectedIndex = -1;
-      if (matches.length > 0) renderSuggestions(matches);
-      else {
-        suggestions.classList.add("hidden");
-        suggestions.innerHTML = "";
-      }
+      renderSuggestions(matches);
     });
 
     searchInput.addEventListener("keydown", (e) => {
@@ -121,20 +194,17 @@
       } else if (e.key === "Enter") {
         e.preventDefault();
         if (selectedIndex >= 0) {
-          // Go to highlighted suggestion
           window.location.href = `https://wyr.es/${items[selectedIndex].textContent.trim()}`;
         } else {
-          // No suggestion highlighted → use typed value
           const typed = searchInput.value.trim();
           if (typed) window.location.href = `https://wyr.es/${typed}`;
         }
       }
     });
 
-    // Close suggestions on click outside
     document.addEventListener("click", e => {
       if (!searchInput.contains(e.target) && !suggestions.contains(e.target)) {
-        suggestions.classList.add("hidden");
+        suggestions.style.display = "none";
       }
     });
   </script>
