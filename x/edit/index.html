@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Wyr.es URL Shortener</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f1f5f9;
+    color: #1e293b;
+    margin: 0;
+    padding: 0;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  h1, h2 {
+    margin: 0 0 15px 0;
+    font-weight: 100;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  input[type="text"] {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    box-sizing: border-box;
+  }
+
+  input:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: #cbd5e1;
+  }
+
+  button {
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-weight: bold;
+  }
+
+  .btn-add { background-color: #3b82f6; color: white; }
+  .btn-add:hover { background-color: #2563eb; }
+
+  .btn-clear { background-color: #e2e8f0; color: #1e293b; }
+  .btn-clear:hover { background-color: #cbd5e1; }
+
+  .btn-copy { background-color: #3b82f6; color: white; margin-right: 5px; }
+  .btn-copy:hover { background-color: #2563eb; }
+
+  .btn-delete { background-color: #ef4444; color: white; margin-right: 5px; }
+  .btn-delete:hover { background-color: #dc2626; }
+
+  .btn-save { background-color: #16a34a; color: white; margin-right: 5px; }
+  .btn-save:hover { background-color: #15803d; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #cbd5e1; }
+  th.actions, td.actions { text-align: right; white-space: nowrap; padding-right: 20px; }
+
+  .search-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+
+  input#search {
+    flex: 1;
+    min-width: 150px;
+  }
+
+  @media(max-width:500px){
+    .search-container {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .search-container button {
+      width: 100%;
+      margin-top: 5px;
+    }
+  }
+
+  .toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 999;
+  }
+
+  .toast {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    opacity: 0.95;
+    transition: opacity 0.3s;
+  }
+
+  .flex-gap {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>wyr.es URL Shortener</h1>
+
+  <!-- Add Link Card -->
+  <div class="card">
+    <h2>Add a New Link</h2>
+    <form id="addForm" class="flex-gap">
+      <input type="text" placeholder="Long URL" id="newUrl" required style="flex:1; min-width:250px;">
+      <input type="text" placeholder="Custom alias (optional)" id="newAlias" style="width:200px;">
+      <button type="submit" class="btn-add">Add Link</button>
+    </form>
+    <p id="lastAdded" style="color:#16a34a; margin-top:5px;"></p>
+  </div>
+
+  <!-- Search & Table Card -->
+  <div class="card">
+    <div class="search-container">
+      <input type="text" placeholder="Search links" id="search">
+      <button class="btn-clear" id="clearSearch">Clear</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Alias</th>
+          <th>Long URL</th>
+          <th class="actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="linkTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyDFP5GAwTNqLyaySh_t_2j8NFiulHTeFy8",
+  authDomain: "fwdng-1d5f9.firebaseapp.com",
+  databaseURL: "https://fwdng-1d5f9.firebaseio.com",
+  projectId: "fwdng-1d5f9",
+  storageBucket: "fwdng-1d5f9.firebasestorage.app",
+  messagingSenderId: "250477002363",
+  appId: "1:250477002363:web:95a89409c8d5991a9aacde"
+});
+
+const RESERVED = ['X'];
+
+function showToast(msg) {
+  const container = document.getElementById("toastContainer");
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = 0; setTimeout(()=>toast.remove(),300); }, 2500);
+}
+
+function normalizeUrl(url) {
+  return /^https?:\/\//i.test(url) ? url : "https://" + url;
+}
+
+function generateAlias(len=7) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let alias = '';
+  for(let i=0;i<len;i++) alias += chars[Math.floor(Math.random()*chars.length)];
+  return alias;
+}
+
+async function renderTable(search='') {
+  const tbody = document.getElementById("linkTableBody");
+  tbody.innerHTML = '';
+
+  const snap = await firebase.database().ref("wyres").get();
+  const links = snap.exists() 
+    ? Object.entries(snap.val()).map(([key, val]) => ({...val, alias: key}))
+    : [];
+
+  const filtered = links.filter(l =>
+    l.alias.toLowerCase().includes(search.toLowerCase()) ||
+    l.longUrl.toLowerCase().includes(search.toLowerCase())
+  ).sort((a,b) => (b.updated||0)-(a.updated||0));
+
+  filtered.forEach(link => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input type="text" value="${link.alias}" style="width:100%;"></td>
+      <td><input type="text" value="${link.longUrl}" style="width:100%;"></td>
+      <td>
+        <button class="btn-copy">Copy</button>
+        <button class="btn-save">Save</button>
+        <button class="btn-delete">Delete</button>
+      </td>
+    `;
+
+    const [aliasInput, urlInput, copyBtn, saveBtn, deleteBtn] = [
+      tr.children[0].children[0],
+      tr.children[1].children[0],
+      tr.children[2].children[0],
+      tr.children[2].children[1],
+      tr.children[2].children[2]
+    ];
+
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText("https://wyr.es/" + aliasInput.value).then(()=>showToast("Copied!"));
+    });
+
+    saveBtn.addEventListener('click', async () => {
+      const newAlias = aliasInput.value.trim();
+      const newUrl = normalizeUrl(urlInput.value.trim());
+      if(!newAlias || !newUrl) return showToast("Invalid input");
+
+      const existsSnap = await firebase.database().ref("wyres/" + newAlias).get();
+      const exists = existsSnap.exists() && newAlias !== link.alias;
+      if(exists) return showToast("Alias exists");
+      if(RESERVED.includes(newAlias)) return showToast("Alias reserved");
+
+      await firebase.database().ref("wyres/" + newAlias).set({...link, alias:newAlias, longUrl:newUrl, updated:Date.now()});
+      if(newAlias !== link.alias) await firebase.database().ref("wyres/" + link.alias).remove();
+
+      showToast("Saved");
+      renderTable(document.getElementById("search").value);
+    });
+
+    deleteBtn.addEventListener('click', async () => {
+      if(confirm("Delete this link?")) {
+        await firebase.database().ref("wyres/" + link.alias).remove();
+        showToast("Deleted");
+        renderTable(document.getElementById("search").value);
+      }
+    });
+
+    tbody.appendChild(tr);
+  });
+}
+
+// Add link
+document.getElementById("addForm").addEventListener('submit', async e => {
+  e.preventDefault();
+  const urlInput = document.getElementById("newUrl");
+  const aliasInput = document.getElementById("newAlias");
+  const url = normalizeUrl(urlInput.value.trim());
+  const alias = aliasInput.value.trim() || generateAlias(8);
+
+  if(RESERVED.includes(alias)) return showToast("Alias reserved");
+
+  const exists = (await firebase.database().ref("wyres/" + alias).get()).exists();
+  if(exists) return showToast("Alias exists");
+
+  await firebase.database().ref("wyres/" + alias).set({alias, longUrl:url, created:Date.now(), updated:Date.now()});
+  document.getElementById("lastAdded").textContent = "https://wyr.es/" + alias;
+  urlInput.value = '';
+  aliasInput.value = '';
+  showToast("Link added");
+  renderTable();
+});
+
+// Search
+document.getElementById("search").addEventListener('input', e => renderTable(e.target.value));
+document.getElementById("clearSearch").addEventListener('click', () => {
+  document.getElementById("search").value = '';
+  renderTable();
+});
+
+// Initial render
+renderTable();
+</script>
+
+</body>
+</html>
