@@ -4,12 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>wyr.es</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --theme: #bdff94;
+  --theme: #c5ffa0;
   --main: #2d2d2d;
-  --secondary: rgb(255, 166, 181);
+  --secondary: rgb(255, 129, 150);
+  --weight: 200;
 }
 
 * {
@@ -20,9 +21,9 @@ html, body {
   padding: 0;
   height: 100%;
   font-family: 'Inter', system-ui, sans-serif;
-  font-weight: 300;
+  font-weight: var(--weight);
   background-color: #ffffff;
-  color: var(--main);
+  color: var(--secondary);
 }
 body {
   display: flex;
@@ -33,7 +34,7 @@ body {
   overflow-x: hidden;
 }
 h1 {
-  font-weight: 300;
+  font-weight: var(--weight);
   font-size: clamp(4vh, 10vw, 10vh);
   margin: 2vh 0;
   text-align: center;
@@ -50,16 +51,17 @@ h1 {
 #searchInput {
   width: 100%;
   max-width: 100%;
-  padding: 2.5vh 2.5vw 2.5vh 2vw;
+  /* padding: 2.5vh 2.5vw 2.5vh 2vw; */
   font-size: 4vh;
   border-radius: 16px;
   border: 1px solid var(--theme);
   font-family: 'Inter', system-ui, sans-serif;
-  font-weight: 300;
+  font-weight: var(--weight);
   background-color: var(--theme);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   caret-color: var(--secondary);
+  color: var(--secondary);
   
 }
 #searchInput:focus {
@@ -69,7 +71,7 @@ h1 {
 #searchInput::placeholder {
   color: var(--secondary);
   opacity: 1; /* important for Safari */
-  font-weight: 500;
+  /* font-weight: 500; */
 }
 
 .clear-button {
@@ -107,7 +109,7 @@ h1 {
 }
 #suggestions li:hover,
 #suggestions li.active {
-  background-color: var(--secondary);
+  background-color: var(--theme);
 }
 @media (min-width: 600px) {
   h1 {
