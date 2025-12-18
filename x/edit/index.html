@@ -276,13 +276,21 @@ const loginBtn = document.getElementById('loginBtn');
 
 // 🔐 allowlist — only these emails can edit
 const ALLOWED_EMAILS = [
-  "you@gmail.com",
-  "your.other@gmail.com"
+  "natepuls@gmail.com",
+  "bekahpuls@gmail.com"
 ];
 
 loginBtn.onclick = () => {
-  auth.signInWithPopup(provider);
+  auth.signInWithPopup(provider)
+    .then(result => {
+      console.log("Signed in:", result.user.email);
+    })
+    .catch(error => {
+      console.error("Sign‑in error:", error);
+      alert("Sign‑in failed: " + error.message);
+    });
 };
+
 
 auth.onAuthStateChanged(user => {
   if (!user) {
@@ -302,14 +310,7 @@ auth.onAuthStateChanged(user => {
   app.style.display = 'block';
 });
 
-firebase.auth().signInWithPopup(provider)
-  .then(result => {
-    console.log("Signed in:", result.user.email);
-  })
-  .catch(error => {
-    console.error("Sign‑in error:", error);
-    alert("Sign‑in failed: " + error.message);
-  });
+
 
 
 
