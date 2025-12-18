@@ -64,6 +64,7 @@
       padding: 6px 12px;
       font-weight: 400;
       font-family: 'Inter', sans-serif;
+      
     }
 
     .btn-add {
@@ -204,6 +205,13 @@
 
 <body>
 
+  <div id="authGate" style="display:none; text-align:center; margin-top:40px;">
+  <button id="loginBtn" class="btn-add">Sign in with Google</button>
+</div>
+
+<div class="container" id="app" style="display:none;">
+
+
   <div class="container">
     <h1><a href="/" style="text-decoration:none; color:inherit;">wyr.es</a></h1>
 
@@ -237,10 +245,15 @@
     </div>
   </div>
 
+  </div>
+
+
   <div class="toast-container" id="toastContainer"></div>
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
   <script>
     firebase.initializeApp({
       apiKey: "AIzaSyDFP5GAwTNqLyaySh_t_2j8NFiulHTeFy8",
@@ -251,6 +264,56 @@
       messagingSenderId: "250477002363",
       appId: "1:250477002363:web:95a89409c8d5991a9aacde"
     });
+
+    // AUTH
+
+    const auth = firebase.auth();
+const provider = new firebase.auth.GoogleAuthProvider();
+
+const authGate = document.getElementById('authGate');
+const app = document.getElementById('app');
+const loginBtn = document.getElementById('loginBtn');
+
+// 🔐 allowlist — only these emails can edit
+const ALLOWED_EMAILS = [
+  "you@gmail.com",
+  "your.other@gmail.com"
+];
+
+loginBtn.onclick = () => {
+  auth.signInWithPopup(provider);
+};
+
+auth.onAuthStateChanged(user => {
+  if (!user) {
+    authGate.style.display = 'block';
+    app.style.display = 'none';
+    return;
+  }
+
+  if (!ALLOWED_EMAILS.includes(user.email)) {
+    alert("Access denied");
+    auth.signOut();
+    return;
+  }
+
+  // ✅ authorized
+  authGate.style.display = 'none';
+  app.style.display = 'block';
+});
+
+firebase.auth().signInWithPopup(provider)
+  .then(result => {
+    console.log("Signed in:", result.user.email);
+  })
+  .catch(error => {
+    console.error("Sign‑in error:", error);
+    alert("Sign‑in failed: " + error.message);
+  });
+
+
+
+// END AUTH
 
     const RESERVED = ['X'];
     let links = [];
