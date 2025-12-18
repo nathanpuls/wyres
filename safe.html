@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="/manifest.json">
+
+<!-- Favicon icons (optional but good for older browsers) -->
+<link rel="icon" type="image/png" sizes="192x192" href="/x/favicon/android-chrome-192x192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/x/favicon/android-chrome-512x512.png">
+
+<!-- Theme color for browser UI -->
+<meta name="theme-color" content="#ffffff">
+
+
+<title>wyr.es</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #c5ffa0;
+  --theme: white;
+  --accent: var(--green);
+  --main: #2d2d2d;
+  --pink: rgb(255, 129, 150);
+  --secondary: black;
+  --weight: 200;
+}
+
+* {
+  box-sizing: border-box;
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: var(--weight);
+  background-color: #ffffff;
+  color: var(--secondary);
+}
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0;
+  overflow-x: hidden;
+}
+h1 {
+  font-weight: var(--weight);
+  font-size: clamp(4vh, 10vw, 10vh);
+  margin: 2vh 0;
+  text-align: center;
+  word-break: break-word;
+  color: #ccc;
+}
+.search-container {
+  width: 95%;
+  max-width: 600px;
+  position: relative;
+  margin: 0 auto;
+  margin-top: 30px;
+}
+#searchInput {
+  width: 100%;
+  max-width: 100%;
+  padding: 2.5vh 2.5vw 2.5vh 2vw;
+  font-size: 4vh;
+  border-radius: 16px;
+  border: 1px solid var(--theme);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: var(--weight);
+  background-color: var(--theme);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  caret-color: var(--secondary);
+  color: var(--secondary);
+  
+}
+#searchInput:focus {
+  outline: none;
+}
+
+#searchInput::placeholder {
+  color: var(--secondary);
+  opacity: 1; /* important for Safari */
+  /* font-weight: 500; */
+}
+
+.clear-button {
+  position: absolute;
+  right: 0.8rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 5vh;
+  cursor: pointer;
+  display: none;
+  color: var(--secondary);
+  user-select: none;
+}
+
+#suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin-top: 0.5rem;
+  padding: 2.5vh 2vw;
+  list-style: none;
+  max-height: 50vh;
+  overflow-y: auto;
+  display: none;
+  z-index: 10;
+  font-size: 4vh;
+}
+#suggestions li {
+  padding: 2vh 2vw;
+  cursor: pointer;
+}
+#suggestions li:hover,
+#suggestions li.active {
+  background-color: var(--green);
+}
+@media (min-width: 600px) {
+  h1 {
+    font-size: clamp(5vh, 8vw, 12vh);
+  }
+  #searchInput {
+    font-size: 5vh;
+    padding: 3vh 2vw;
+  }
+  #suggestions {
+    font-size: 5vh;
+  }
+  #suggestions li {
+    padding: 1.5vh 1vw;
+  }
+  .clear-button {
+    font-size: 3.5vh;
+  }
+}
+</style>
+</head>
+<body>
+<!-- <h1>wyr.es/</h1> -->
+<div class="search-container">
+  <input id="searchInput" type="text" placeholder="wyr.es" autofocus autocomplete="off" />
+  <span class="clear-button" id="clearBtn">&times;</span>
+  <ul id="suggestions"></ul>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyDFP5GAwTNqLyaySh_t_2j8NFiulHTeFy8",
+  authDomain: "fwdng-1d5f9.firebaseapp.com",
+  databaseURL: "https://fwdng-1d5f9.firebaseio.com",
+  projectId: "fwdng-1d5f9",
+  storageBucket: "fwdng-1d5f9.firebasestorage.app",
+  messagingSenderId: "250477002363",
+  appId: "1:250477002363:web:95a89409c8d5991a9aacde"
+});
+
+const db = firebase.database();
+let allAliases = [];
+
+async function loadAliases() {
+  const snap = await db.ref("wyres").get();
+  allAliases = snap.exists() ? Object.values(snap.val()) : [];
+}
+loadAliases();
+
+const searchInput = document.getElementById("searchInput");
+const suggestions = document.getElementById("suggestions");
+const clearBtn = document.getElementById("clearBtn");
+let selectedIndex = -1;
+
+function renderSuggestions(matches) {
+  suggestions.innerHTML = matches.map((a, idx) => `
+    <li class="${idx === selectedIndex ? 'active' : ''}" data-index="${idx}">
+      ${a.alias}
+    </li>
+  `).join("");
+  suggestions.style.display = matches.length ? "block" : "none";
+  Array.from(suggestions.children).forEach((li, idx) => {
+    li.onclick = () => {
+      const aliasLower = matches[idx].alias.toLowerCase();
+      window.location.href = `https://wyr.es/${aliasLower}`;
+    };
+  });
+}
+
+function updateHighlight() {
+  Array.from(suggestions.children).forEach((li, idx) => {
+    li.classList.toggle("active", idx === selectedIndex);
+  });
+}
+
+function updateClearButton() {
+  clearBtn.style.display = searchInput.value.trim() ? "block" : "none";
+}
+
+searchInput.addEventListener("input", () => {
+  updateClearButton();
+  const q = searchInput.value.toLowerCase().trim();
+  if (!q) {
+    suggestions.style.display = "none";
+    suggestions.innerHTML = "";
+    selectedIndex = -1;
+    return;
+  }
+  const matches = allAliases
+    .filter(a => a.alias.toLowerCase().includes(q))
+    .sort((a, b) => {
+      const aliasA = a.alias.toLowerCase();
+      const aliasB = b.alias.toLowerCase();
+      if (aliasA === q) return -1;
+      if (aliasB === q) return 1;
+      if (aliasA.startsWith(q) && !aliasB.startsWith(q)) return -1;
+      if (!aliasA.startsWith(q) && aliasB.startsWith(q)) return 1;
+      return aliasA.localeCompare(aliasB);
+    })
+    .slice(0, 10);
+  selectedIndex = -1;
+  renderSuggestions(matches);
+});
+
+searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+    closeSuggestions();
+    return;
+  }
+  const items = suggestions.children;
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    if (!items.length) return;
+    selectedIndex = (selectedIndex + 1) % items.length;
+    updateHighlight();
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    if (!items.length) return;
+    selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+    updateHighlight();
+  } else if (e.key === "Enter") {
+    e.preventDefault();
+    if (selectedIndex >= 0) {
+      const selectedAliasLower = items[selectedIndex].textContent.trim().toLowerCase();
+      window.location.href = `https://wyr.es/${selectedAliasLower}`;
+    } else {
+      const typed = searchInput.value.trim();
+      if (typed) window.location.href = `https://wyr.es/${typed.toLowerCase()}`;
+    }
+  }
+});
+
+clearBtn.addEventListener("click", () => {
+  searchInput.value = "";
+  searchInput.focus();
+  clearBtn.style.display = "none";
+  suggestions.style.display = "none";
+});
+
+document.addEventListener("click", e => {
+  if (!searchInput.contains(e.target) && !suggestions.contains(e.target)) {
+    suggestions.style.display = "none";
+  }
+});
+
+function closeSuggestions() {
+  suggestions.style.display = "none";
+  suggestions.innerHTML = "";
+  selectedIndex = -1;
+}
+
+window.addEventListener("pageshow", () => {
+  closeSuggestions();
+  searchInput.value = "";
+  clearBtn.style.display = "none";
+  searchInput.focus();
+});
+
+document.body.addEventListener("touchstart", () => {
+  searchInput.focus();
+}, { once: true });
+
+document.addEventListener("click", (e) => {
+  if (
+    suggestions.contains(e.target) ||
+    clearBtn.contains(e.target) ||
+    searchInput.contains(e.target)
+  ) {
+    return;
+  }
+
+  searchInput.focus();
+});
+
+</script>
+</body>
+</html>
