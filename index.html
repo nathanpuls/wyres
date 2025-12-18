@@ -6,6 +6,11 @@
 <title>wyr.es</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
+:root {
+  --theme: #cefbb3;
+  --main: #2d2d2d;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -16,7 +21,7 @@ html, body {
   font-family: 'Inter', system-ui, sans-serif;
   font-weight: 300;
   background-color: #ffffff;
-  color: #2d2d2d;
+  color: var(--main);
 }
 body {
   display: flex;
@@ -39,6 +44,7 @@ h1 {
   max-width: 600px;
   position: relative;
   margin: 0 auto;
+  margin-top: 30px;
 }
 #searchInput {
   width: 100%;
@@ -46,9 +52,10 @@ h1 {
   padding: 2.5vh 2.5vw 2.5vh 2vw;
   font-size: 4vh;
   border-radius: 16px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--theme);
   font-family: 'Inter', system-ui, sans-serif;
   font-weight: 300;
+  background-color: var(--theme);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -63,12 +70,10 @@ h1 {
   font-size: 4vh;
   cursor: pointer;
   display: none;
-  color: #ccc;
+  color: var(--main);
   user-select: none;
 }
-.clear-button:hover {
-  color: #555;
-}
+
 #suggestions {
   position: absolute;
   top: 100%;
@@ -92,7 +97,7 @@ h1 {
 }
 #suggestions li:hover,
 #suggestions li.active {
-  background-color: #cefbb3;
+  background-color: var(--theme);
 }
 @media (min-width: 600px) {
   h1 {
@@ -115,9 +120,9 @@ h1 {
 </style>
 </head>
 <body>
-<h1>wyr.es/</h1>
+<!-- <h1>wyr.es/</h1> -->
 <div class="search-container">
-  <input id="searchInput" type="text" placeholder="" autofocus autocomplete="off" />
+  <input id="searchInput" type="text" placeholder="wyr.es/" autofocus autocomplete="off" />
   <span class="clear-button" id="clearBtn">&times;</span>
   <ul id="suggestions"></ul>
 </div>
@@ -245,6 +250,13 @@ function closeSuggestions() {
   suggestions.innerHTML = "";
   selectedIndex = -1;
 }
+
+window.addEventListener("pageshow", () => {
+  closeSuggestions();
+  searchInput.value = "";
+  clearBtn.style.display = "none";
+});
+
 
 </script>
 </body>
