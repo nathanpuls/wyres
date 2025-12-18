@@ -2,14 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wyr.es URL Shortener</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <style>
   body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; color: #1e293b; margin: 0; padding: 0; }
   .container { max-width: 900px; margin: 0 auto; padding: 20px; }
   h1,h2 { margin: 0 0 15px 0; font-weight: 100; }
-  .card { background: #fff; border-radius: 12px; padding: 20px 25px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-  input[type="text"] { padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; box-sizing: border-box; }
+  .card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  input[type="text"] { padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; box-sizing: border-box; width: 100%; }
   input:focus { outline: none; box-shadow: none; border-color: #cbd5e1; }
   button { cursor: pointer; border: none; border-radius: 8px; padding: 6px 12px; font-weight: bold; }
   .btn-add { background-color: #3b82f6; color: white; } .btn-add:hover { background-color: #2563eb; }
@@ -17,17 +18,29 @@
   .btn-copy { background-color: #3b82f6; color: white; margin-right: 5px; } .btn-copy:hover { background-color: #2563eb; }
   .btn-delete { background-color: #ef4444; color: white; margin-right: 5px; } .btn-delete:hover { background-color: #dc2626; }
   .btn-save { background-color: #16a34a; color: white; margin-right: 5px; } .btn-save:hover { background-color: #15803d; }
+
   table { width: 100%; border-collapse: collapse; }
   th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #cbd5e1; }
   th.actions, td.actions { text-align: right; white-space: nowrap; padding-right: 20px; }
-  .search-container { display: flex; align-items: center; gap: 5px; margin-bottom: 10px; }
-  input#search { flex: 1; min-width: 150px; }
-  @media(max-width:500px){ .search-container { flex-direction: column; align-items: stretch; } .search-container button { width: 100%; margin-top: 5px; } }
+
+  .search-container { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+  .search-container input { flex: 1; min-width: 150px; }
+  .search-container button { flex-shrink: 0; }
+
   .toast-container { position: fixed; top: 20px; right: 20px; z-index: 999; }
   .toast { background-color: #333; color: #fff; padding: 10px 15px; margin-bottom: 8px; border-radius: 8px; opacity: 0.95; transition: opacity 0.3s; }
   .flex-gap { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+  /* Mobile adjustments */
+  @media(max-width:600px){
+    .flex-gap, .search-container { flex-direction: column; align-items: stretch; }
+    .search-container button, .flex-gap button { width: 100%; margin-top: 5px; }
+    table { display: block; overflow-x: auto; white-space: nowrap; }
+    th, td { padding: 8px 6px; }
+  }
 </style>
 </head>
+
 <body>
 
 <div class="container">
@@ -107,17 +120,23 @@ function createRow(link) {
       <button class="btn-copy">Copy</button>
       <button class="btn-save">Save</button>
       <button class="btn-delete">Delete</button>
+      <button class="btn-go">Go</button>
     </td>
   `;
-  const [aliasInput, urlInput, copyBtn, saveBtn, deleteBtn] = [
+
+  const [aliasInput, urlInput, copyBtn, saveBtn, deleteBtn, goBtn] = [
     tr.children[0].children[0],
     tr.children[1].children[0],
     tr.children[2].children[0],
     tr.children[2].children[1],
-    tr.children[2].children[2]
+    tr.children[2].children[2],
+    tr.children[2].children[3]
   ];
 
-  copyBtn.addEventListener('click', () => navigator.clipboard.writeText("https://wyr.es/" + aliasInput.value).then(()=>showToast("Copied!")));
+  copyBtn.addEventListener('click', () => 
+    navigator.clipboard.writeText("https://wyr.es/" + aliasInput.value)
+      .then(()=>showToast("Copied!"))
+  );
 
   saveBtn.addEventListener('click', async () => {
     const newAlias = aliasInput.value.trim();
@@ -146,8 +165,14 @@ function createRow(link) {
     }
   });
 
+  goBtn.addEventListener('click', () => {
+    const targetUrl = normalizeUrl(urlInput.value.trim());
+    window.open(targetUrl, "_blank"); // Open in new tab
+  });
+
   return tr;
 }
+
 
 function renderTable(search='') {
   const tbody = document.getElementById("linkTableBody");
