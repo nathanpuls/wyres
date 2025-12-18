@@ -4,11 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>wyr.es</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --theme: #aaff76;
+  --theme: #bdff94;
   --main: #2d2d2d;
+  --secondary: rgb(255, 166, 181);
 }
 
 * {
@@ -58,7 +59,7 @@ h1 {
   background-color: var(--theme);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  caret-color: white;
+  caret-color: var(--secondary);
   
 }
 #searchInput:focus {
@@ -66,9 +67,9 @@ h1 {
 }
 
 #searchInput::placeholder {
-  color: #ffffff;
+  color: var(--secondary);
   opacity: 1; /* important for Safari */
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .clear-button {
@@ -76,10 +77,10 @@ h1 {
   right: 0.8rem;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 4vh;
+  font-size: 5vh;
   cursor: pointer;
   display: none;
-  color: var(--main);
+  color: var(--secondary);
   user-select: none;
 }
 
@@ -106,7 +107,7 @@ h1 {
 }
 #suggestions li:hover,
 #suggestions li.active {
-  background-color: var(--theme);
+  background-color: var(--secondary);
 }
 @media (min-width: 600px) {
   h1 {
