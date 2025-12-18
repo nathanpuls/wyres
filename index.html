@@ -122,7 +122,7 @@ h1 {
 <body>
 <!-- <h1>wyr.es/</h1> -->
 <div class="search-container">
-  <input id="searchInput" type="text" placeholder="wyr.es3/" autofocus autocomplete="off" />
+  <input id="searchInput" type="text" placeholder="wyr.es/" autofocus autocomplete="off" />
   <span class="clear-button" id="clearBtn">&times;</span>
   <ul id="suggestions"></ul>
 </div>
@@ -261,6 +261,18 @@ window.addEventListener("pageshow", () => {
 document.body.addEventListener("touchstart", () => {
   searchInput.focus();
 }, { once: true });
+
+document.addEventListener("click", (e) => {
+  if (
+    suggestions.contains(e.target) ||
+    clearBtn.contains(e.target) ||
+    searchInput.contains(e.target)
+  ) {
+    return;
+  }
+
+  searchInput.focus();
+});
 
 </script>
 </body>
