@@ -233,6 +233,23 @@ document.getElementById("clearSearch").addEventListener('click', () => {
   document.getElementById("search").value = '';
   renderTable();
 });
+
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  const incomingUrl = params.get('l');
+
+  if (incomingUrl) {
+    const decoded = decodeURIComponent(incomingUrl);
+    const input = document.getElementById('newUrl');
+    if (input) {
+      input.value = decoded;
+      input.focus();
+    }
+
+    // Optional: clean URL bar
+    history.replaceState({}, document.title, window.location.pathname);
+  }
+})();
 </script>
 
 </body>
