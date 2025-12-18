@@ -7,9 +7,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --theme: #c5ffa0;
+  --green: #c5ffa0;
+  --theme: white;
+  --accent: var(--green);
   --main: #2d2d2d;
-  --secondary: rgb(255, 129, 150);
+  --pink: rgb(255, 129, 150);
+  --secondary: black;
   --weight: 200;
 }
 
@@ -51,7 +54,7 @@ h1 {
 #searchInput {
   width: 100%;
   max-width: 100%;
-  /* padding: 2.5vh 2.5vw 2.5vh 2vw; */
+  padding: 2.5vh 2.5vw 2.5vh 2vw;
   font-size: 4vh;
   border-radius: 16px;
   border: 1px solid var(--theme);
@@ -109,7 +112,7 @@ h1 {
 }
 #suggestions li:hover,
 #suggestions li.active {
-  background-color: var(--theme);
+  background-color: var(--green);
 }
 @media (min-width: 600px) {
   h1 {
