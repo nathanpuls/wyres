@@ -15,6 +15,11 @@
     rel="stylesheet">
 
   <style>
+
+:root {
+      --secondary: rgb(72, 72, 72);
+    }
+
     * {
       box-sizing: border-box;
     }
@@ -109,7 +114,7 @@
 
     #suggestions li span.number {
       font-size: 14px !important;
-      color: #ccc;
+      color: var(--secondary);
       margin-right: 0.5em;
       vertical-align: middle;
     }
@@ -147,7 +152,7 @@
 <body>
 
   <div class="search-container">
-    <input id="searchInput" type="text" placeholder="wyr.es" autofocus autocomplete="off" />
+    <input id="searchInput" type="text" placeholder=" wyr.es" autofocus autocomplete="off" />
     <span class="clear-button" id="clearBtn">&times;</span>
     <ul id="suggestions"></ul>
   </div>
@@ -184,7 +189,7 @@
     function renderSuggestions(matches) {
       suggestions.innerHTML = matches.map((a, idx) => `
     <li class="${idx === selectedIndex ? 'active' : ''}" data-index="${idx}" data-alias="${a.alias}">
-      <span class="number">tab ${idx + 1}</span>${a.alias}
+      <span class="number">${idx + 1}</span>${a.alias}
     </li>
   `).join("");
       suggestions.style.display = matches.length ? "block" : "none";
