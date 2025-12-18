@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --theme: #cefbb3;
+  --theme: #aaff76;
   --main: #2d2d2d;
 }
 
@@ -58,10 +58,19 @@ h1 {
   background-color: var(--theme);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  caret-color: white;
+  
 }
 #searchInput:focus {
   outline: none;
 }
+
+#searchInput::placeholder {
+  color: #ffffff;
+  opacity: 1; /* important for Safari */
+  font-weight: 600;
+}
+
 .clear-button {
   position: absolute;
   right: 0.8rem;
@@ -122,7 +131,7 @@ h1 {
 <body>
 <!-- <h1>wyr.es/</h1> -->
 <div class="search-container">
-  <input id="searchInput" type="text" placeholder="wyr.es/" autofocus autocomplete="off" />
+  <input id="searchInput" type="text" placeholder="wyr.es" autofocus autocomplete="off" />
   <span class="clear-button" id="clearBtn">&times;</span>
   <ul id="suggestions"></ul>
 </div>
