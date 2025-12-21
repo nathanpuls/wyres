@@ -15,8 +15,7 @@
     rel="stylesheet">
 
   <style>
-
-:root {
+    :root {
       --secondary: rgb(72, 72, 72);
     }
 
@@ -54,7 +53,7 @@
     }
 
     #searchInput {
-      width: 100%;
+      width: 90%;
       max-width: 100%;
       padding: 2.5vh 2.5vw 2.5vh 2vw;
       font-size: 4vh;
@@ -314,6 +313,27 @@
     document.body.addEventListener("touchstart", () => {
       searchInput.focus();
     }, { once: true });
+
+    function focusSearch() {
+      // Don't refocus if it's already focused
+      if (document.activeElement !== searchInput) {
+        searchInput.focus({ preventScroll: true });
+      }
+    }
+
+    // Mouse clicks anywhere
+    document.addEventListener("click", (e) => {
+      // If user clicked inside the input or suggestions, do nothing
+      if (searchInput.contains(e.target) || suggestions.contains(e.target)) return;
+      focusSearch();
+    });
+
+    // Touch taps anywhere (mobile)
+    document.addEventListener("touchstart", (e) => {
+      if (searchInput.contains(e.target) || suggestions.contains(e.target)) return;
+      focusSearch();
+    });
+
   </script>
 </body>
 
